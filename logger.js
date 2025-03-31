@@ -1,4 +1,4 @@
-const EventEmitter = require('events'); //CLASS
+const EventEmitter = require('events'); //CLASS -> PascalCase
 
 // console.log(__filename);
 // console.log(__dirname);
