@@ -1,26 +1,26 @@
 const Joi = require('joi');
 const express = require('express');
-const app = express();
+const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 
-app.use(express.json());
+router.use(express.json());
 
 let blogs = [];
 
 // GET 
-app.get('/api/blogs', (req, res) => {
+router.get('/blogs', (req, res) => {
     res.send(blogs);
 })
 
 // GET SINLGE BLOG
-app.get('/api/blogs/:id', (req, res) => {
+router.get('/blogs/:id', (req, res) => {
     const blog = blogs.find(b => b.id === req.params.id);
     if (!blog) return res.status(404).send("The blog with the given id was not found");
     res.send(blog);
 });
 
 // POST
-app.post('/api/blogs', (req, res) => {
+router.post('/blogs', (req, res) => {
     const { error } = validateBlogs(req.body);
     if(error) return res.status(400).send(error.details[0].message);
 
@@ -36,7 +36,7 @@ app.post('/api/blogs', (req, res) => {
 })
 
 // PUT
-app.put('/api/blogs/:id', (req, res) => {
+router.put('/blogs/:id', (req, res) => {
     const blog = blogs.find(b => b.id === req.params.id);
     if(!blog) return res.status(404).send("The blog with the given id was not found")
 
@@ -50,7 +50,7 @@ app.put('/api/blogs/:id', (req, res) => {
 })
 
 // DELETE
-app.delete('/api/blogs/:id', (req, res) => {
+router.delete('/blogs/:id', (req, res) => {
     const blog = blogs.find(b => b.id === req.params.id);
     if (!blog) return res.status(404).send("The blog with the given id was not found");
 
@@ -71,5 +71,4 @@ function validateBlogs(blog) {
     return schema.validate(blog);
 }
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+module.exports = router;

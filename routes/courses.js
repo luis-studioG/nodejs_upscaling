@@ -10,10 +10,6 @@ const courses = [
     { id: 3, name: 'course3'},
 ];
 
-// router.get('/', (req, res) => {
-//     res.send("Hello Wold!!!!")
-// });
-
 router.get('/', (req, res) => {
     res.send(courses);
 });
@@ -70,4 +66,4 @@ function validateCourse(course) {
     return schema.validate(course);
 }
 
-module.exports =  router;
+module.exports = router;
