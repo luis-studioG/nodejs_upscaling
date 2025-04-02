@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const z = require('zod');
 const { v4: uuidv4 } = require('uuid');
-const { parse } = require('path');
 
 router.use(express.json());
 
@@ -36,7 +35,7 @@ router.post('/', (req, res) => {
     const validation = productSchema.safeParse(req.body);
 
     if (!validation.success) {
-        return res.status(400).json({ error:  formatZodErrors(validation.error) });
+        return res.status(400).json({ error: formatZodErrors(validation.error) });
     }
 
      const newProduct = {
@@ -47,7 +46,7 @@ router.post('/', (req, res) => {
     }
     products.push(newProduct);
 
-    res.status(201).send({ data: "Product created!", product: newProduct });
+    res.status(201).send({ message: "Product created!", product: newProduct });
 });
 
 router.put('/:id', (req, res) => {
@@ -64,7 +63,7 @@ router.put('/:id', (req, res) => {
     product.description = req.body.description;
     product.price = req.body.price;
 
-    res.send({ data: "Product updated!", product });
+    res.send({ message: "Product updated!", product });
 });
 
 router.delete('/:id', (req, res) => {
@@ -80,6 +79,7 @@ router.delete('/:id', (req, res) => {
 });
 
 router.get('/filter/by-price', (req, res) => {
+    // console.log(req.url, req.method, req.headers)
     const minPrice = parseFloat(req.query.min);
     const maxPrice = parseFloat(req.query.max);
     
@@ -92,7 +92,7 @@ router.get('/filter/by-price', (req, res) => {
         return res.status(404).json({ message: "No products found in this price range." });
     }
 
-    res.json({ data: `Products filtered with min price ${minPrice} and max price ${maxPrice}`, products: fileredProducts });
+    res.json({ message: `Products filtered with min price ${minPrice} and max price ${maxPrice}`, products: fileredProducts });
 })
 
 module.exports = router; 
