@@ -62,3 +62,13 @@ app.use((req, res, next) => {
     next();
 })
 `
+
+# Mongo DB
+1. brew tap mongodb/brew
+2. brew install mongodb-community@7.0
+3. mongod --version
+4. brew services start mongodb-community@7.0
+5. brew services list
+6. Download MongoDB Compass from: https://www.mongodb.com/try/download/compass
+7. Open MongoDb Compass and enter connection, click connect.
+8. mongosh

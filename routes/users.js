@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const z = require('zod');
 const { v4: uuidv4 } = require('uuid');
-const formatZodErrors = require('../utils/helpers');
+const { formatZodErrors, capitalizeFirstLetter } = require('../utils/helpers');
 
 router.use(express.json());
 
@@ -94,6 +94,34 @@ router.delete('/:id', (req, res) => {
 
     res.send({ message: "User deleted!", data: user });
 });
+
+// Filter by age
+router.get('/filter/byAge', (req, res) => {
+    const age = parseFloat(req.query.age);
+
+    if(isNaN(age) || age < 0) {
+        res.status(400).send({ message: "Invalid age. Must be a positive number"})
+    }
+
+    const filteredUsers = users.filter(u => u.age === age);
+     if (filteredUsers.length === 0) {
+        return res.status(404).json({ message: "No users found with this age!" });
+    }
+
+    res.json({ message: `There is ${filteredUsers.length} user${filteredUsers.length > 1 ? 's' : ''} with ${age} years old.`, data: filteredUsers });
+})
+
+// Filter by city
+router.get('/filter/byCity', (req, res) => {
+    const city = req.query.city.toLowerCase();
+
+    const filteredUsers = users.filter(u => u.address.city.toLowerCase() === city);
+     if (filteredUsers.length === 0) {
+        return res.status(404).json({ message: "No users found in this city!" });
+    }
+
+    res.json({ message: `Users living in ${capitalizeFirstLetter(city)}.`, data: filteredUsers });
+})
 
 
 module.exports = router;

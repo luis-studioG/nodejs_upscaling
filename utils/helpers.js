@@ -5,5 +5,9 @@ function formatZodErrors(error) {
     }));
 }
 
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
 // Export the function
-module.exports = formatZodErrors;
+module.exports = { formatZodErrors, capitalizeFirstLetter };
