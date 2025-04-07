@@ -72,3 +72,9 @@ app.use((req, res, next) => {
 6. Download MongoDB Compass from: https://www.mongodb.com/try/download/compass
 7. Open MongoDb Compass and enter connection, click connect.
 8. mongosh
+
+CRUD Operations within Mongo DB:
+- insertOne();
+- find(); 
+- updateOne();
+- deleteOne();
