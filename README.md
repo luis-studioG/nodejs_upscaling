@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 7. Open MongoDb Compass and enter connection, click connect.
 8. mongosh
 
-CRUD Operations within Mongo DB:
+CRUD Operations within Mongo DB: https://www.youtube.com/watch?v=c2M-rlkkT5o
 - insertOne();
 - find(); 
 - updateOne();

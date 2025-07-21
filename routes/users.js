@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const z = require('zod');
+const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const { formatZodErrors, capitalizeFirstLetter } = require('../utils/helpers');
+const { getDb } = require('../utils/database');
 
 router.use(express.json());
 
@@ -19,59 +20,76 @@ const users = [
     }
 ]
 
-const usersSchema = z.object({
-    name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
-    email: z.string().email("This is not a valid email."),
-    age: z.number().positive({ message: "Age must be a positive number" }),
-    address: z.object({
-        city: z.string().min(3),
-        zipcode: z.number().positive().min(4, { message: "Zipcode must be at least 4 characters long" }),
-    }),
-});
-
-router.get('/', (req, res) => {
-    res.send(users);
-});
-
-router.get('/:id', (req, res) => {
-    const user = users.find(c => c.id === req.params.id);
-    if(!user) return res.status(404).send("The user with the given id was not found")
-    res.send({ message: `User with id "${user.id}" found!`, data: user});
-});
-
-
-router.post('/', (req, res) => {
-    const validation = usersSchema.safeParse(req.body);
-
-    if (!validation.success) {
-        return res.status(400).json({ error: formatZodErrors(validation.error) });
+router.get('/', async (req, res) => {
+    try {
+        const db = getDb();
+        const users = await db.collection('users').find().toArray();
+        res.send(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Error fetching users');
     }
+});
 
-     const newUser = {
-        id: uuidv4(),
-        name: req.body.name,
-        email: req.body.email,
-        age: req.body.age,
-        address: {
-            city: req.body.address.city,
-            zipcode: req.body.address.zipcode
+router.get('/:id', async (req, res) => {
+    try {
+        const db = getDb();
+        const user = await db.collection('users').findOne({ id: req.params.id });
+        if(!user) return res.status(404).send("The user with the given id was not found")
+        res.send({ message: `User with id "${user.id}" found!`, data: user});
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).send('Error fetching user');
+    }
+});
+
+
+router.post('/', async (req, res) => {
+    try {
+        const { error } = validateUser(req.body);
+        if(error) {
+            console.log('Validation error:', error.details[0].message);
+            return res.status(400).send(error.details[0].message);
         }
-    }
-    users.push(newUser);
 
-    res.status(201).send({ message: "User created!", user: newUser });
+        const newUser = {
+            id: uuidv4(),
+            name: req.body.name,
+            email: req.body.email,
+            age: req.body.age,
+            address: {
+                city: req.body.address.city,
+                zipcode: req.body.address.zipcode
+            },
+            createdAt: new Date()
+        }
+        
+        console.log('Attempting to save user:', newUser);
+        const db = getDb();
+        const result = await db.collection('users').insertOne(newUser);
+        console.log('User saved successfully:', result.insertedId);
+        res.status(201).send({ message: "User created!", user: newUser, insertedId: result.insertedId });
+    } catch (error) {
+        console.error('Error creating user:', error);
+        console.error('Error stack:', error.stack);
+        res.status(500).send('Error creating user: ' + error.message);
+    }
 });
 
-router.put('/:id', (req, res) => {
-    const user = users.find(u => u.id === req.params.id);
-    if (!user) {
-        return res.status(404).send({ error: "User not found!", data: {} });
+router.put('/:id', async (req, res) => {
+    try {   
+        const db = getDb();
+        const user = await db.collection('users').findOne({ id: req.params.id });
+        if (!user) {
+            return res.status(404).send({ error: "User not found!", data: {} });
     }
 
-    const validation = usersSchema.safeParse(req.body);
-    if (!validation.success) {
-        return res.status(400).json({ error: formatZodErrors(validation.error) });
+    const { error } = validateUser(req.body);
+    if(error) {
+        console.log('Validation error:', error.details[0].message);
+        return res.status(400).send(error.details[0].message);
     }
+
     user.name = req.body.name;
     user.email = req.body.email;
     user.age = req.body.age;
@@ -80,23 +98,33 @@ router.put('/:id', (req, res) => {
         zipcode: req.body.address.zipcode 
     }
 
-    res.send({ message: "User updated!", data: user });
+        const result = await db.collection('users').updateOne({ id: req.params.id }, { $set: user });
+        res.send({ message: "User updated!", data: user, updatedCount: result.modifiedCount });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).send('Error updating user');
+    }
 })
 
-router.delete('/:id', (req, res) => {
-    const user = users.find(u => u.id === req.params.id);
-    if (!user) {
-        return res.status(404).send({ error: "User not found!" });
+router.delete('/:id', async (req, res) => {
+    try {
+        const db = getDb();
+        const user = await db.collection('users').findOne({ id: req.params.id });
+        if (!user) {
+            return res.status(404).send({ error: "User not found!" });
     }
 
-    const index = users.indexOf(user);
-    users.splice(index, 1);
-
-    res.send({ message: "User deleted!", data: user });
+        const result = await db.collection('users').deleteOne({ id: req.params.id });
+        res.send({ message: "User deleted!", data: user, deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).send('Error deleting user');
+    }
 });
 
 // Filter by age
 router.get('/filter/byAge', (req, res) => {
+    try {
     const age = parseFloat(req.query.age);
 
     if(isNaN(age) || age < 0) {
@@ -109,19 +137,47 @@ router.get('/filter/byAge', (req, res) => {
     }
 
     res.json({ message: `There is ${filteredUsers.length} user${filteredUsers.length > 1 ? 's' : ''} with ${age} years old.`, data: filteredUsers });
+    } catch (error) {
+        console.error('Error filtering users by age:', error);
+        res.status(500).send('Error filtering users');
+    }
 })
 
 // Filter by city
-router.get('/filter/byCity', (req, res) => {
-    const city = req.query.city.toLowerCase();
+router.get('/filter/byCity', async (req, res) => {
+    try {
+        const db = getDb();
+        const city = req.query.city;
+                
+        // Try case-insensitive search using regex
+        const filteredUsers = await db.collection('users').find({ 
+            "address.city": { $regex: new RegExp(city, "i") } 
+        }).toArray();
+        
+        console.log('Filtered users:', filteredUsers);
 
-    const filteredUsers = users.filter(u => u.address.city.toLowerCase() === city);
-     if (filteredUsers.length === 0) {
-        return res.status(404).json({ message: "No users found in this city!" });
+        if (filteredUsers.length === 0) {
+            return res.status(404).json({ message: "No users found in this city!" });
+        }
+
+        res.json({ message: `Users living in ${capitalizeFirstLetter(city)}.`, data: filteredUsers });
+    } catch (error) {
+        console.error('Error filtering users by city:', error);
+        res.status(500).send('Error filtering users');
     }
+    })
 
-    res.json({ message: `Users living in ${capitalizeFirstLetter(city)}.`, data: filteredUsers });
-})
-
+function validateUser(user) {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required(),
+        email: Joi.string().email().required(),
+        age: Joi.number().positive().required(),
+        address: Joi.object({
+            city: Joi.string().min(3).required(),
+            zipcode: Joi.number().positive().required(),
+        }).required(),
+    });
+     return schema.validate(user);
+}
 
 module.exports = router;
