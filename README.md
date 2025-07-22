@@ -150,6 +150,5 @@ db.collection.find({
 db.collection.find({
   name: { $regex: "doe$", $options: "i" }
 })
-
 ```
 
