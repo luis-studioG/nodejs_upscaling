@@ -123,10 +123,11 @@ db.collection.find({
 })
 ```
 - $nor: nor
+```
 db.collection.find({
   $nor: [
     { age: { $lt: 20 } },
     { city: "Los Angeles" }
   ]
 })
-
+```
