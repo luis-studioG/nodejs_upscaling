@@ -58,6 +58,8 @@ Is a node js web application framework that provides broad features for building
 # Middleware
 Functions that can run prior to running a HTTP request. 
 
+Example: /middleware/logger.js
+
 ```
 app.use((req, res, next) => {
     console.log("Middleware called!");
@@ -131,5 +133,11 @@ db.collection.find({
     { age: { $lt: 20 } },
     { city: "Los Angeles" }
   ]
+})
+```
+- $regex: regex (case-insensitive)
+```
+db.collection.find({
+  name: { $regex: "john" }
 })
 ```
