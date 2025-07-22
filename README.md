@@ -78,3 +78,55 @@ CRUD Operations within Mongo DB: https://www.youtube.com/watch?v=c2M-rlkkT5o
 - find(); 
 - updateOne();
 - deleteOne();
+
+Logical operators:
+- $eq: equal to
+- $ne: not equal to
+- $gt: greater than
+- $gte: greater than or equal to
+- $lt: less than
+- $lte: less than or equal to
+- $in: in
+- $nin: not in
+- $and: and
+```
+db.collection.find({
+  $and: [
+    { age: { $gt: 25 } },
+    { city: "New York" }
+  ]
+})
+```
+- $or: or
+```
+db.collection.find({
+  $or: [
+    { age: { $gt: 25 } },
+    { city: "New York" }
+  ]
+})
+```
+- $not: not
+```
+db.collection.find({
+  $not: {
+    age: { $gt: 25 }
+  }
+})
+```
+- $exists: exists
+```
+db.collection.find({
+  $exists: {
+    age: true
+  }
+})
+```
+- $nor: nor
+db.collection.find({
+  $nor: [
+    { age: { $lt: 20 } },
+    { city: "Los Angeles" }
+  ]
+})
+
