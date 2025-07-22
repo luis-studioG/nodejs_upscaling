@@ -140,4 +140,16 @@ db.collection.find({
 db.collection.find({
   name: { $regex: "john" }
 })
+
+// Starts with "john"
+db.collection.find({
+  name: { $regex: "^john", $options: "i" }
+})
+
+// Ends with "doe"
+db.collection.find({
+  name: { $regex: "doe$", $options: "i" }
+})
+
 ```
+
