@@ -125,6 +125,7 @@ CREATE TABLE table_name (
 ```
 INSERT INTO table_name (column1, column2, ...)
 VALUES (value1, value2, ...);
+```
 
 4. Update a record
 ```
