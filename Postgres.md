@@ -90,3 +90,51 @@ ORDER BY employee_name;
 - Consistency: data is valid according to business rules
 - Isolation: concurrent transactions are isolated from each other
 - Durability: once a transaction is committed, it persists even in case of system failure
+
+
+# Postgres
+Run psql -U postgres to connect to the database.
+
+Run psql -U postgres -d database_name to connect to a specific database.
+
+Run psql -U postgres -d database_name -f file.sql to run a script file.
+
+Run \q to quit the database.
+
+Run \l to list all databases.
+
+Run \c database_name to connect to a specific database.
+
+Run \dt to list all tables.
+
+1. Create a database
+```
+CREATE DATABASE database_name;
+```
+
+2. Create a table
+```
+CREATE TABLE table_name (
+    column1 data_type,  
+    column2 data_type,
+    ...
+);
+```
+
+3. Insert a record
+```
+INSERT INTO table_name (column1, column2, ...)
+VALUES (value1, value2, ...);
+
+4. Update a record
+```
+UPDATE table_name
+SET column1 = value1, column2 = value2
+WHERE condition;
+```
+
+5. Delete a record
+```
+DELETE FROM table_name
+WHERE condition;
+```
