@@ -139,3 +139,67 @@ WHERE condition;
 DELETE FROM table_name
 WHERE condition;
 ```
+
+6. LIKE
+```
+SELECT * FROM table_name
+WHERE column_name LIKE '%value%';
+```
+
+7. IN
+```
+SELECT * FROM table_name
+WHERE column_name IN (value1, value2, ...);
+```
+
+8. BETWEEN
+```
+SELECT * FROM table_name
+WHERE column_name BETWEEN value1 AND value2;
+```
+
+9. AND
+```
+SELECT * FROM table_name
+WHERE column_name AND value1 AND value2;
+```
+
+10. OR
+```
+SELECT * FROM table_name
+WHERE column_name OR value1 OR value2;
+```
+
+11. NOT
+```
+SELECT * FROM table_name
+WHERE column_name NOT value1;
+```
+
+12. NOW
+```
+SELECT NOW()::DATE - INTERVAL '1 day';
+
+SELECT NOW()::DATE - INTERVAL '1 day' AS yesterday;
+```
+
+13. EXTRACT
+```
+SELECT EXTRACT(YEAR FROM NOW()); // 2025
+
+SELECT EXTRACT(MONTH FROM NOW()); // 7
+
+SELECT EXTRACT(DAY FROM NOW()); // 23
+
+SELECT EXTRACT(DOW FROM NOW()); // 1 (Wednesday)
+```
+
+14. UNIQUE Constraint
+```
+CREATE TABLE table_name (
+    column1 data_type NOT NULL UNIQUE, // unique value for each row
+    column2 data_type NOT NULL,
+    ...
+);
+```
+
