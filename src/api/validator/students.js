@@ -16,9 +16,10 @@ const validateStudent = (student) => {
 // Validation for updates (email not editable)
 const validateStudentUpdate = (student) => {
     const schema = Joi.object({
-        first_name: Joi.string().required(),
+        first_name: Joi.string().required().messages({ message: 'First name is required' }),
         last_name: Joi.string().required(),
         gender: Joi.string().required(),
+        email: Joi.string().email().required(),
         date_of_birth: Joi.date().required(),
         country_of_birth: Joi.string().required()
     });
